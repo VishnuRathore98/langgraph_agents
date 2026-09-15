@@ -1,0 +1,11 @@
+[project]
+name = "langgraph-agents"
+version = "0.1.0"
+description = "Creating different types of agents using langgraph"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "langchain-openrouter>=0.2.8",
+    "langgraph>=1.2.11",
+    "pydantic-settings>=2.15.0",
+]
