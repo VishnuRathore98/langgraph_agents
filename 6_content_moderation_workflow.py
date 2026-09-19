@@ -15,29 +15,51 @@ class ModerationState(TypedDict):
 
 # Define nodes methods
 def formal_post(state: ModerationState) -> dict:
-    pass
+    formatted_post = f"User {state['user_reputation']}, says: {state['post_content']}"
+
+    return {"formatted_post": formatted_post}
 
 
 def analyze_content(state: ModerationState) -> dict:
-    pass
+    content = state["post_content"].lower()
+
+    if "spam" in content or "free" in content or "buy" in content:
+        content_flag = "rejected"
+    elif state["user_reputation"] == "new_user":
+        content_flag = "review"
+    else:
+        content_flag = "approved"
+
+    return {"content_flag": content_flag}
 
 
 def check_condition(
     state: ModerationState,
 ) -> Literal["approve_post", "flag_for_review", "reject_post"]:
-    pass
+    if state["content_flag"] == "rejected":
+        return "reject_post"
+    elif state["content_flag"] == "review":
+        return "flag_for_review"
+    else:
+        return "approve_post"
 
 
 def approve_post(state: ModerationState) -> dict:
-    pass
+    result = "Post approved and posted successfully on your timeline."
+
+    return {"result": result}
 
 
 def flag_for_review(state: ModerationState) -> dict:
-    pass
+    result = "Post is flagged and sent for review."
+
+    return {"result": result}
 
 
 def reject_post(state: ModerationState) -> dict:
-    pass
+    result = "Post is rejected as it seems violating our policy."
+
+    return {"result": result}
 
 
 # Declare graph
@@ -65,7 +87,18 @@ graph.add_edge("reject_post", END)
 workflow = graph.compile()
 
 # Define Initial state
-initial_state = {"": ""}
+# initial_state = {
+#     "post_content": "Checkout this new free product!",
+#     "user_reputation": "new_user",
+# }
+# initial_state = {
+#     "post_content": "Checkout this new product!",
+#     "user_reputation": "new_user",
+# }
+initial_state = {
+    "post_content": "Checkout this new product!",
+    "user_reputation": "approved_user",
+}
 
 # Invoke graph
 response = workflow.invoke(initial_state)
