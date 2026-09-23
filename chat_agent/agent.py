@@ -2,8 +2,10 @@ from typing import Annotated, TypedDict
 
 from langchain_core.messages import BaseMessage, HumanMessage
 from langchain_openrouter import ChatOpenRouter
+from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, START, StateGraph, add_messages
 from rich import print
+from ulid import ULID
 
 from config import settings
 
@@ -25,6 +27,10 @@ def chatbot_node(state: ChatState):
     return {"messages": [response]}
 
 
+thread_id = str(ULID())
+config = {"configurable": {"thread_id": thread_id}}
+checkpoint = MemorySaver()
+
 graph = StateGraph(ChatState)
 
 graph.add_node("chatbot_node", chatbot_node)
@@ -32,7 +38,7 @@ graph.add_node("chatbot_node", chatbot_node)
 graph.add_edge(START, "chatbot_node")
 graph.add_edge("chatbot_node", END)
 
-chatbot = graph.compile()
+chatbot = graph.compile(checkpointer=checkpoint)
 
 # initial_state = {"messages": "hey, how are you?"}
 
@@ -44,5 +50,7 @@ while True:
     message = input("User: ")
     if message == "exit" or message == "quit":
         break
-    result = chatbot.invoke({"messages": [HumanMessage(content=message)]})
-    print(result)
+    result = chatbot.invoke(
+        {"messages": [HumanMessage(content=message)]}, config=config
+    )
+    print(result["messages"][-1].content)
