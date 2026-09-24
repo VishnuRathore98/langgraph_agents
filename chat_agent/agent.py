@@ -46,11 +46,11 @@ chatbot = graph.compile(checkpointer=checkpoint)
 
 # print(result)
 
-while True:
-    message = input("User: ")
-    if message == "exit" or message == "quit":
-        break
-    result = chatbot.invoke(
-        {"messages": [HumanMessage(content=message)]}, config=config
-    )
-    print(result["messages"][-1].content)
+# while True:
+#     message = input("User: ")
+#     if message == "exit" or message == "quit":
+#         break
+#     result = chatbot.invoke(
+#         {"messages": [HumanMessage(content=message)]}, config=config
+#     )
+#     print(result["messages"][-1].content)

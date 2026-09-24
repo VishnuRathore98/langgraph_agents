@@ -11,4 +11,5 @@ dependencies = [
     "pydantic-settings>=2.15.0",
     "python-ulid>=4.0.1",
     "rich>=15.0.0",
+    "streamlit>=1.64.0",
 ]
