@@ -5,7 +5,6 @@ from langchain_openrouter import ChatOpenRouter
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, START, StateGraph, add_messages
 from rich import print
-from ulid import ULID
 
 from config import settings
 
@@ -27,8 +26,6 @@ def chatbot_node(state: ChatState):
     return {"messages": [response]}
 
 
-thread_id = str(ULID())
-config = {"configurable": {"thread_id": thread_id}}
 checkpoint = MemorySaver()
 
 graph = StateGraph(ChatState)

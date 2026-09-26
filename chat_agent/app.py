@@ -1,12 +1,35 @@
 import streamlit as st
-from agent import HumanMessage, chatbot, config
+from agent import HumanMessage, chatbot
+from ulid import ULID
 
 st.title("Agent Neo", text_alignment="center")
+st.sidebar.title("Your Chat History")
 
 user_input = st.chat_input("Ask anything...")
 
 if "message_history" not in st.session_state:
     st.session_state["message_history"] = []
+
+if "chat_history" not in st.session_state:
+    st.session_state["chat_history"] = []
+
+
+def add_thread():
+    chat_id = str(ULID())
+    st.session_state["chat_history"].append(chat_id)
+    return chat_id
+
+
+config = {"configurable": {"thread_id": "1"}}
+
+# thread_id = add_thread()
+
+# Feature under development
+if st.sidebar.button(label="New Chat"):
+    chat_id = add_thread()
+    config = {"configurable": {"thread_id": chat_id}}
+    for chat in st.session_state["chat_history"]:
+        st.sidebar.text(chat)
 
 for message in st.session_state["message_history"]:
     with st.chat_message(message["role"]):
