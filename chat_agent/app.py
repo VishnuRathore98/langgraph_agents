@@ -20,16 +20,22 @@ def add_thread():
     return chat_id
 
 
-config = {"configurable": {"thread_id": "1"}}
+print("Session State: ", len(st.session_state["chat_history"]))
 
-# thread_id = add_thread()
+chat_id = ""
+
+if len(st.session_state["chat_history"]) == 0:
+    print("chat history is empty creating new chat id")
+    chat_id = add_thread()
 
 # Feature under development
 if st.sidebar.button(label="New Chat"):
     chat_id = add_thread()
-    config = {"configurable": {"thread_id": chat_id}}
+    print("Creating new chat id from button")
     for chat in st.session_state["chat_history"]:
         st.sidebar.text(chat)
+print("chat id: ", chat_id)
+config = {"configurable": {"thread_id": chat_id}}
 
 for message in st.session_state["message_history"]:
     with st.chat_message(message["role"]):
