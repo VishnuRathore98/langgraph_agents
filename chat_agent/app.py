@@ -7,35 +7,44 @@ st.sidebar.title("Your Chat History")
 
 user_input = st.chat_input("Ask anything...")
 
-if "message_history" not in st.session_state:
-    st.session_state["message_history"] = []
+if "chat_sessions" not in st.session_state:
+    st.session_state["chat_sessions"] = {}
 
 if "chat_history" not in st.session_state:
     st.session_state["chat_history"] = []
+    st.session_state["chat_history"].append(str(ULID()))
+
+if "message_history" not in st.session_state:
+    st.session_state["message_history"] = []
+
+
+if "current_chat" not in st.session_state:
+    st.session_state["current_chat"] = st.session_state["chat_history"][-1]
 
 
 def add_thread():
     chat_id = str(ULID())
-    st.session_state["chat_history"].append(chat_id)
+    st.session_state["chat_history"].append(str(chat_id))
     return chat_id
 
 
-print("Session State: ", len(st.session_state["chat_history"]))
+def select_chat(chat_id: str):
+    print("chat id: ", chat_id)
+    st.session_state["message_history"] = []
+    st.session_state["current_chat"] = chat_id
 
-chat_id = ""
 
-if len(st.session_state["chat_history"]) == 0:
-    print("chat history is empty creating new chat id")
-    chat_id = add_thread()
-
-# Feature under development
 if st.sidebar.button(label="New Chat"):
     chat_id = add_thread()
-    print("Creating new chat id from button")
-    for chat in st.session_state["chat_history"]:
-        st.sidebar.text(chat)
-print("chat id: ", chat_id)
-config = {"configurable": {"thread_id": chat_id}}
+    st.session_state["message_history"] = []
+    st.session_state["current_chat"] = chat_id
+
+
+for chat in st.session_state["chat_history"]:
+    st.sidebar.button(label=chat, type="tertiary", on_click=select_chat, args=(chat,))
+
+print(st.session_state["current_chat"])
+config = {"configurable": {"thread_id": st.session_state["current_chat"]}}
 
 for message in st.session_state["message_history"]:
     with st.chat_message(message["role"]):
