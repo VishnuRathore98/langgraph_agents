@@ -1,8 +1,10 @@
+import sqlite3
 from typing import Annotated, TypedDict
 
 from langchain_core.messages import BaseMessage, HumanMessage
 from langchain_openrouter import ChatOpenRouter
 from langgraph.checkpoint.memory import MemorySaver
+from langgraph.checkpoint.sqlite import SqliteSaver
 from langgraph.graph import END, START, StateGraph, add_messages
 from rich import print
 
@@ -26,7 +28,10 @@ def chatbot_node(state: ChatState):
     return {"messages": [response]}
 
 
-checkpoint = MemorySaver()
+conn = sqlite3.connect(database="chatbot.db", check_same_thread=False)
+
+# checkpoint = MemorySaver()
+checkpoint = SqliteSaver(conn)
 
 graph = StateGraph(ChatState)
 
