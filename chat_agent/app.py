@@ -46,6 +46,14 @@ for chat_id, chat_history in st.session_state["chat_sessions"].items():
 
 # print("",st.session_state["current_chat"])
 config = {"configurable": {"thread_id": st.session_state["current_chat"]}}
+# for state in chatbot.get_state(config=config):
+# print("Chatbot state :  ", state)
+
+state = chatbot.get_state(config=config)
+print(type(state))
+# print(state.values["messages"])
+for message in state.values["messages"]:
+    print(message.type)  # 'human' or 'ai'
 
 for message in st.session_state["chat_sessions"][st.session_state["current_chat"]]:
     with st.chat_message(message["role"]):
@@ -71,4 +79,4 @@ if user_input:
     st.session_state["chat_sessions"][st.session_state["current_chat"]].append(
         {"role": "assistant", "content": assistant_response}
     )
-    # print(st.session_state["chat_sessions"])
+    # print("Chat Sessions: ", st.session_state["chat_sessions"])

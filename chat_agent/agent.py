@@ -42,6 +42,10 @@ graph.add_edge("chatbot_node", END)
 
 chatbot = graph.compile(checkpointer=checkpoint)
 
+threads = checkpoint.list(config=None)
+
+# for thread in threads:
+#     print("Thread: ", thread)
 # initial_state = {"messages": "hey, how are you?"}
 
 # result = chatbot.invoke(initial_state)
