@@ -7,8 +7,12 @@ from langgraph.checkpoint.memory import MemorySaver
 from langgraph.checkpoint.sqlite import SqliteSaver
 from langgraph.graph import END, START, StateGraph, add_messages
 from rich import print
+from langsmith import traceable
+from dotenv import load_dotenv
 
 from config import settings
+
+load_dotenv()
 
 model = ChatOpenRouter(
     model=settings.OPEN_ROUTER_MODEL,
@@ -22,6 +26,7 @@ class ChatState(TypedDict):
     messages: Annotated[list[BaseMessage], add_messages]
 
 
+@traceable
 def chatbot_node(state: ChatState):
     messages = state["messages"]
     response = model.invoke(messages)
@@ -44,6 +49,13 @@ chatbot = graph.compile(checkpointer=checkpoint)
 
 threads = checkpoint.list(config=None)
 
+threads_set = set()
+for thread in threads:
+    threads_set.add(thread.config["configurable"]["thread_id"])
+
+res = model.invoke("How are you?")
+print(res)
+# print("Thread set: ", threads_set)
 # for thread in threads:
 #     print("Thread: ", thread)
 # initial_state = {"messages": "hey, how are you?"}

@@ -1,5 +1,5 @@
 import streamlit as st
-from agent import HumanMessage, chatbot
+from agent import HumanMessage, chatbot, threads_set
 from rich import print
 from ulid import ULID
 
@@ -8,26 +8,22 @@ st.sidebar.title("Your Chat History")
 
 user_input = st.chat_input("Ask anything...")
 
+
 if "chat_sessions" not in st.session_state:
-    st.session_state["chat_sessions"] = {}
-    st.session_state["chat_sessions"][str(ULID())] = []
+    st.session_state["chat_sessions"] = list(threads_set)
 
 
 if "current_chat" not in st.session_state:
-    st.session_state["current_chat"] = list(st.session_state["chat_sessions"].keys())[
-        -1
-    ]
+    st.session_state["current_chat"] = st.session_state["chat_sessions"][-1]
 
 
 def add_thread():
     chat_id = str(ULID())
-    st.session_state["chat_sessions"][chat_id] = []
-    # print("All available sessions: ", st.session_state["chat_sessions"])
+    st.session_state["chat_sessions"].append(chat_id)
     return chat_id
 
 
-def select_chat(chat_id: str, chat_history: list):
-    # print("current selected chat: ", (chat_id, chat_history))
+def select_chat(chat_id: str):
     st.session_state["current_chat"] = chat_id
 
 
@@ -36,33 +32,29 @@ if st.sidebar.button(label="New Chat"):
     st.session_state["current_chat"] = chat_id
 
 
-for chat_id, chat_history in st.session_state["chat_sessions"].items():
+for chat_id in st.session_state["chat_sessions"]:
     st.sidebar.button(
         label=chat_id,
         type="tertiary",
         on_click=select_chat,
-        args=(chat_id, chat_history),
+        args=(chat_id,),
     )
 
-# print("",st.session_state["current_chat"])
 config = {"configurable": {"thread_id": st.session_state["current_chat"]}}
-# for state in chatbot.get_state(config=config):
-# print("Chatbot state :  ", state)
+
 
 state = chatbot.get_state(config=config)
-print(type(state))
-# print(state.values["messages"])
-for message in state.values["messages"]:
-    print(message.type)  # 'human' or 'ai'
 
-for message in st.session_state["chat_sessions"][st.session_state["current_chat"]]:
-    with st.chat_message(message["role"]):
-        st.text(message["content"])
+# print(type(state))
+# for message in state.values["messages"]:
+#     print(message)  # 'human' or 'ai'
+# print("New state: ", state)
+if len(state.values) != 0:
+    for message in state.values["messages"]:
+        with st.chat_message(message.type):
+            st.text(message.content)
 
 if user_input:
-    st.session_state["chat_sessions"][st.session_state["current_chat"]].append(
-        {"role": "user", "content": user_input}
-    )
     with st.chat_message("human"):
         st.text(user_input)
 
@@ -76,7 +68,4 @@ if user_input:
             )
         )
 
-    st.session_state["chat_sessions"][st.session_state["current_chat"]].append(
-        {"role": "assistant", "content": assistant_response}
-    )
     # print("Chat Sessions: ", st.session_state["chat_sessions"])
