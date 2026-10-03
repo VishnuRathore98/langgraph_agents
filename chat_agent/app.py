@@ -45,10 +45,7 @@ config = {"configurable": {"thread_id": st.session_state["current_chat"]}}
 
 state = chatbot.get_state(config=config)
 
-# print(type(state))
-# for message in state.values["messages"]:
-#     print(message)  # 'human' or 'ai'
-# print("New state: ", state)
+
 if len(state.values) != 0:
     for message in state.values["messages"]:
         with st.chat_message(message.type):
@@ -67,5 +64,3 @@ if user_input:
                 stream_mode="messages",
             )
         )
-
-    # print("Chat Sessions: ", st.session_state["chat_sessions"])

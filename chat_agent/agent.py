@@ -1,14 +1,14 @@
 import sqlite3
 from typing import Annotated, TypedDict
 
+from dotenv import load_dotenv
 from langchain_core.messages import BaseMessage, HumanMessage
 from langchain_openrouter import ChatOpenRouter
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.checkpoint.sqlite import SqliteSaver
 from langgraph.graph import END, START, StateGraph, add_messages
-from rich import print
 from langsmith import traceable
-from dotenv import load_dotenv
+from rich import print
 
 from config import settings
 
@@ -55,20 +55,3 @@ for thread in threads:
 
 res = model.invoke("How are you?")
 print(res)
-# print("Thread set: ", threads_set)
-# for thread in threads:
-#     print("Thread: ", thread)
-# initial_state = {"messages": "hey, how are you?"}
-
-# result = chatbot.invoke(initial_state)
-
-# print(result)
-
-# while True:
-#     message = input("User: ")
-#     if message == "exit" or message == "quit":
-#         break
-#     result = chatbot.invoke(
-#         {"messages": [HumanMessage(content=message)]}, config=config
-#     )
-#     print(result["messages"][-1].content)
