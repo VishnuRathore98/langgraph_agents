@@ -2,13 +2,15 @@ import sqlite3
 from typing import Annotated, TypedDict
 
 from dotenv import load_dotenv
-from langchain_core.messages import BaseMessage, HumanMessage
+from langchain_core.messages import BaseMessage
 from langchain_openrouter import ChatOpenRouter
-from langgraph.checkpoint.memory import MemorySaver
 from langgraph.checkpoint.sqlite import SqliteSaver
 from langgraph.graph import END, START, StateGraph, add_messages
-from langsmith import traceable
+from langgraph.prebuilt import ToolNode, tools_condition
 from rich import print
+
+# pyrefly: ignore [missing-import]
+from tools import calculator_tool
 
 from config import settings
 
@@ -21,16 +23,24 @@ model = ChatOpenRouter(
     max_tokens=1024,
 )
 
+tools = [calculator_tool]
+
+model = model.bind_tools(tools=tools)
+
+# print(calculator_tool(2, 3, "addition"))
+
 
 class ChatState(TypedDict):
     messages: Annotated[list[BaseMessage], add_messages]
 
 
-@traceable
 def chatbot_node(state: ChatState):
     messages = state["messages"]
     response = model.invoke(messages)
     return {"messages": [response]}
+
+
+tools = ToolNode(tools=tools)
 
 
 conn = sqlite3.connect(database="chatbot.db", check_same_thread=False)
@@ -41,9 +51,12 @@ checkpoint = SqliteSaver(conn)
 graph = StateGraph(ChatState)
 
 graph.add_node("chatbot_node", chatbot_node)
+graph.add_node("tools", tools)
 
 graph.add_edge(START, "chatbot_node")
-graph.add_edge("chatbot_node", END)
+graph.add_conditional_edges("chatbot_node", tools_condition)
+graph.add_edge("tools", "chatbot_node")
+# graph.add_edge("chatbot_node", END)
 
 chatbot = graph.compile(checkpointer=checkpoint)
 
@@ -53,5 +66,5 @@ threads_set = set()
 for thread in threads:
     threads_set.add(thread.config["configurable"]["thread_id"])
 
-res = model.invoke("How are you?")
-print(res)
+# res = model.invoke("How are you?")
+# print(res)
