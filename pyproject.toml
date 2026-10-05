@@ -13,4 +13,5 @@ dependencies = [
     "python-ulid>=4.0.1",
     "rich>=15.0.0",
     "streamlit>=1.64.0",
+    "tavily-python>=0.8.4",
 ]
