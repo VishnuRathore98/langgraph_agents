@@ -10,7 +10,7 @@ from langgraph.prebuilt import ToolNode, tools_condition
 from rich import print
 
 # pyrefly: ignore [missing-import]
-from tools import calculator_tool
+from tools import calculator_tool, stock_price_tool, weather_tool, web_search_tool
 
 from config import settings
 
@@ -23,7 +23,12 @@ model = ChatOpenRouter(
     max_tokens=1024,
 )
 
-tools = [calculator_tool]
+tools = [
+    calculator_tool,
+    stock_price_tool,
+    weather_tool,
+    web_search_tool,
+]
 
 model = model.bind_tools(tools=tools)
 
@@ -56,7 +61,7 @@ graph.add_node("tools", tools)
 graph.add_edge(START, "chatbot_node")
 graph.add_conditional_edges("chatbot_node", tools_condition)
 graph.add_edge("tools", "chatbot_node")
-# graph.add_edge("chatbot_node", END)
+graph.add_edge("chatbot_node", END)
 
 chatbot = graph.compile(checkpointer=checkpoint)
 
