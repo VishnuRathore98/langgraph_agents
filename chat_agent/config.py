@@ -9,6 +9,8 @@ class Settings(BaseSettings):
 
     OPEN_ROUTER_MODEL: str | None = ""
     OPEN_ROUTER_API_KEY: str | None = ""
+    OPEN_ROUTER_EMBEDDING_MODEL: str | None = ""
+    OPEN_ROUTER_BASE_URL: str | None = ""
     LANGSMITH_TRACING: str | None = ""
     LANGSMITH_ENDPOINT: str | None = ""
     LANGSMITH_API_KEY: str | None = ""
