@@ -21,5 +21,8 @@ class Settings(BaseSettings):
     ALPHA_VANTAGE_STOCK_API_KEY: str | None = ""
     TAVILY_API_KEY: str | None = ""
 
+    HUGGINGFACE_API_KEY: str | None = ""
+    HUGGINGFACE_EMBEDDING_MODEL: str | None = ""
+
 
 settings = Settings()
