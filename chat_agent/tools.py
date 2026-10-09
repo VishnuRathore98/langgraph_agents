@@ -2,6 +2,7 @@ from typing import Literal
 
 import requests
 from langchain_core.tools import tool
+from langgraph.types import Command, interrupt
 from rich import print
 from tavily import TavilyClient
 
@@ -111,6 +112,20 @@ def stock_price_tool(
         },
     )
     return response.json()
+
+
+@tool
+def buy_stocks(symbol: str, stock_count: int):
+    user_decision = interrupt(
+        value=f"Do you wish to continue with the transaction of {stock_count} stocks, for {symbol}? (yes/no)"
+    )
+
+    if user_decision.strip().lower() == "yes":
+        # execute the desired action
+        pass
+    elif user_decision.strip().lower() == "no":
+        # do not execute the action
+        pass
 
 
 # result = calculator_tool(3.3, 4.7, "division")
