@@ -122,10 +122,10 @@ def buy_stocks(symbol: str, stock_count: int):
 
     if user_decision.strip().lower() == "yes":
         # execute the desired action
-        pass
+        return "approved"
     elif user_decision.strip().lower() == "no":
         # do not execute the action
-        pass
+        return "declined"
 
 
 # result = calculator_tool(3.3, 4.7, "division")

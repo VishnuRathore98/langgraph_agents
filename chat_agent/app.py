@@ -1,3 +1,4 @@
+from langgraph.types import Command
 import streamlit as st
 
 # pyrefly: ignore [missing-import]
@@ -60,10 +61,16 @@ if user_input:
 
     with st.chat_message("assistant"):
         assistant_response = st.write_stream(
+            # pyrefly: ignore [parse-error]
             message_chunk.content
             for message_chunk, metadata in chatbot.stream(
                 {"messages": HumanMessage(content=user_input)},
                 config=config,
                 stream_mode="messages",
             )
+            if chatbot.stream.interrupts[0].value:
+                user_response = get_user_response(chatbot.interrupt[0].value)
+                stream_input = Command(resume=user_response)
+
         )
+        
