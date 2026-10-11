@@ -116,19 +116,18 @@ def stock_price_tool(
 
 @tool
 def buy_stocks(symbol: str, stock_count: int):
+    """
+    Use this function to buy stocks for a company requested by the user.
+    eg. buy_stocks(symbol="GOOGL",stock_count=10)
+    """
     user_decision = interrupt(
         value=f"Do you wish to continue with the transaction of {stock_count} stocks, for {symbol}? (yes/no)"
     )
 
-    if user_decision.strip().lower() == "yes":
-        # execute the desired action
-        return "approved"
-    elif user_decision.strip().lower() == "no":
-        # do not execute the action
-        return "declined"
+    return {"approved": user_decision}
 
 
 # result = calculator_tool(3.3, 4.7, "division")
-# result = weather_tool()
+# result = buy_stocks(symbol="APPL", stock_count=20)
 # print(result)
 # print(stock_price_tool(stock_name="IBM", frequecy="GLOBAL_QUOTE"))

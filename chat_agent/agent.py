@@ -1,8 +1,9 @@
+from langgraph.types import Command
 import sqlite3
 from typing import Annotated, TypedDict
 
 from dotenv import load_dotenv
-from langchain_core.messages import BaseMessage
+from langchain_core.messages import BaseMessage, HumanMessage
 from langchain_openrouter import ChatOpenRouter
 from langgraph.checkpoint.sqlite import SqliteSaver
 from langgraph.graph import END, START, StateGraph, add_messages
@@ -10,7 +11,13 @@ from langgraph.prebuilt import ToolNode, tools_condition
 from rich import print
 
 # pyrefly: ignore [missing-import]
-from tools import calculator_tool, stock_price_tool, weather_tool, web_search_tool
+from tools import (
+    buy_stocks,
+    calculator_tool,
+    stock_price_tool,
+    weather_tool,
+    web_search_tool,
+)
 
 from config import settings
 
@@ -28,6 +35,7 @@ tools = [
     stock_price_tool,
     weather_tool,
     web_search_tool,
+    buy_stocks,
 ]
 
 model = model.bind_tools(tools=tools)
@@ -65,11 +73,25 @@ graph.add_edge("chatbot_node", END)
 
 chatbot = graph.compile(checkpointer=checkpoint)
 
-threads = checkpoint.list(config=None)
 
-threads_set = set()
-for thread in threads:
-    threads_set.add(thread.config["configurable"]["thread_id"])
+configuration = {"configurable": {"thread_id": "1234567"}}
+
+response = chatbot.invoke(
+    {"messages": HumanMessage(content="Please buy 10 stocks of apple")},
+    config=configuration,
+)
+
+# if response.interrupt:
+#     print(response.interrupt)
+
+resumed = chatbot.invoke(Command(resume=True), config=configuration)
+
+print(resumed)
+# threads = checkpoint.list(config=None)
+
+# threads_set = set()
+# for thread in threads:
+#     threads_set.add(thread.config["configurable"]["thread_id"])
 
 # res = model.invoke("How are you?")
 # print(res)
